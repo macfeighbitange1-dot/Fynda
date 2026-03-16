@@ -1,0 +1,26 @@
+# API Keys & Secrets (CRITICAL)
+.env
+secrets.toml
+
+# Python Cache & Environment
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+.env/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Project Specific
+*.log
+research_report.md
+performance_chart.png
+research_report.pdf
+
+# IDE Folders
+.vscode/
+.idea/
