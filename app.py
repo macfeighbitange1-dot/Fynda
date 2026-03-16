@@ -91,7 +91,7 @@ st.markdown("""
             font-size: 0.9rem;
         }
     </style>
-""", unsafe_allow_stdio=True)
+""", unsafe_allow_html=True)
 
 # Initialize Agents (Shared session state not strictly needed for basic flow)
 search_engine = ResearchSearch()
