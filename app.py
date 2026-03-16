@@ -103,8 +103,12 @@ def export_pdf(text):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     # Basic PDF text handling
-    pdf.multi_cell(0, 10, txt=text.encode('latin-1', 'replace').decode('latin-1'))
-    return pdf.output(dest='S').encode('latin-1')
+    # We clean the text to ensure latin-1 compatibility for the PDF generator
+    clean_text = text.encode('latin-1', 'replace').decode('latin-1')
+    pdf.multi_cell(0, 10, txt=clean_text)
+    
+    # pdf.output() returns bytes/bytearray already, no need to encode.
+    return bytes(pdf.output())
 
 # Sidebar for Config
 with st.sidebar:
