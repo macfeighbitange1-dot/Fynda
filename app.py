@@ -5,6 +5,7 @@ from core.search import ResearchSearch
 from core.processor import ResearchProcessor
 from core.synthesizer import ResearchSynthesizer
 from core.memory import ResearchVault
+from core.router import route_query  # Ensure this file exists
 from utils.scraper import scrape_content
 from fpdf import FPDF
 
@@ -60,7 +61,7 @@ with st.sidebar:
     st.title("Aletheia Lab")
     st.markdown("---")
     depth = st.slider("Recursive Depth", 1, 3, 1)
-    st.info("Vault Memory & Red Team Critique are ACTIVE.")
+    st.info("Vault Memory & Sovereign Nodes ACTIVE.")
 
 # Main UI
 st.title("🔬 Aletheia: Advanced Research Lab")
@@ -76,42 +77,58 @@ if st.button("Initialize Agentic Research"):
                 st.markdown("### 📡 Live Research Feed")
                 log_area = st.empty()
                 progress_bar = st.progress(0)
-                
-                # --- VAULT RECALL ---
-                log_area.markdown("<p class='log-text'>🧠 Consulting the Knowledge Vault...</p>", unsafe_allow_html=True)
-                past_knowledge = vault.recall_relevant_past(query)
                 reports = []
-                if past_knowledge:
-                    st.info(f"💡 Found relevant past research in the Vault.")
-                    reports.append(past_knowledge)
+
+                # --- STEP 1: ROUTE ---
+                log_area.markdown("<p class='log-text'>🚦 Routing query through Logic Gate...</p>", unsafe_allow_html=True)
+                route = route_query(query)
                 
-                # --- ROUND 1 ---
-                log_area.markdown("<p class='log-text'>🌐 Round 1: Querying live web...</p>", unsafe_allow_html=True)
-                results = search_engine.execute_search(query)
+                # --- STEP 2: PRIORITIZE (VAULT & SOVEREIGN RECALL) ---
+                if route == "SOVEREIGN_NODE":
+                    st.warning("🇰🇪 Sovereign Node Triggered: Prioritizing Kenyan Local Data...")
+                    log_area.markdown("<p class='log-text'>🧠 Querying Kenyan Sovereign Silo...</p>", unsafe_allow_html=True)
+                    # Recall from specialized namespace if your vault supports it
+                    local_intel = vault.recall_relevant_past(query) 
+                    if local_intel:
+                        reports.append(f"SOVEREIGN DATA: {local_intel}")
+                    
+                    # Refine search to authoritative Kenyan domains
+                    search_query = f"{query} site:centralbank.go.ke OR site:nse.co.ke OR site:kra.go.ke OR site:go.ke"
+                else:
+                    log_area.markdown("<p class='log-text'>🧠 Consulting Global Knowledge Vault...</p>", unsafe_allow_html=True)
+                    past_knowledge = vault.recall_relevant_past(query)
+                    if past_knowledge:
+                        reports.append(past_knowledge)
+                    search_query = query
+                
+                # --- STEP 3: EXTRACT (ROUND 1 SEARCH) ---
+                log_area.markdown("<p class='log-text'>🌐 Executing search protocols...</p>", unsafe_allow_html=True)
+                results = search_engine.execute_search(search_query)
                 
                 for i, res in enumerate(results):
-                    log_area.markdown(f"<p class='log-text'>[+] Analyzing: {res['url'][:60]}...</p>", unsafe_allow_html=True)
+                    log_area.markdown(f"<p class='log-text'>[+] Extracting Intelligence: {res['url'][:60]}...</p>", unsafe_allow_html=True)
+                    # Note: Ensure utils/scraper.py is updated to handle PDF/OCR logic
                     content = await scrape_content(res['url'])
                     claims = processor.extract_claims(query, content)
                     reports.append(f"SOURCE: {res['url']}\n{claims}")
                     progress_bar.progress((i + 1) / len(results))
 
-                # --- PHASE 4: AGENTIC AUDIT ---
-                log_area.markdown("<p class='log-text'>⚖️ Running Agentic Audit (Phase 4)...</p>", unsafe_allow_html=True)
+                # --- PHASE 4: AGENTIC AUDIT (COMPARE & CONTRAST) ---
+                log_area.markdown("<p class='log-text'>⚖️ Running Agentic Audit (Compare & Contrast)...</p>", unsafe_allow_html=True)
                 gap_query = synthesizer.check_for_gaps(reports)
                 
                 if gap_query and "NONE" not in gap_query.upper():
-                    st.warning(f"⚠️ Contradiction Detected! Launching Round 2: '{gap_query}'")
+                    st.warning(f"⚠️ Contradiction Detected! Launching Verification: '{gap_query}'")
                     new_results = search_engine.execute_search(gap_query)
                     for res in new_results[:2]:
                         content = await scrape_content(res['url'])
                         reports.append(processor.extract_claims(gap_query, content))
 
                 # --- PHASE 3 & 6: SYNTHESIS & CRITIQUE ---
-                log_area.markdown("<p class='log-text'>✨ Generating Executive Synthesis...</p>", unsafe_allow_html=True)
+                log_area.markdown("<p class='log-text'>✨ Generating Intelligence Synthesis...</p>", unsafe_allow_html=True)
                 draft = synthesizer.synthesize(query, reports)
 
-                log_area.markdown("<p class='log-text'>🛡️ Running Red-Team Critique...</p>", unsafe_allow_html=True)
+                log_area.markdown("<p class='log-text'>🛡️ Final Red-Team Critique...</p>", unsafe_allow_html=True)
                 critique = synthesizer.criticize(query, draft)
                 
                 if "APPROVED" not in critique.upper():
@@ -121,7 +138,7 @@ if st.button("Initialize Agentic Research"):
                     final_report = draft
                 
                 # --- VAULT STORAGE ---
-                log_area.markdown("<p class='log-text'>💾 Archiving intelligence to Knowledge Vault...</p>", unsafe_allow_html=True)
+                log_area.markdown("<p class='log-text'>💾 Archiving to Knowledge Vault...</p>", unsafe_allow_html=True)
                 vault.store_research(query, final_report)
                 
                 st.session_state['final_report'] = final_report
